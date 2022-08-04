@@ -4,7 +4,7 @@ async function drawBarChart() {
   data.sort((a, b) => a.rt_score - b.rt_score);
   //   console.log(data);
   const yAccessor = (d) => d.title;
-  const xAccessor = (d) => d.rt_score;
+  const xAccessor = (d) => d.rt_score / 100;
   //   console.log(yAccessor(data[0]));
   const titles = data.map(yAccessor);
   //   console.log(titles);
@@ -16,7 +16,7 @@ async function drawBarChart() {
       top: 15,
       right: 20,
       bottom: 40,
-      left: 150,
+      left: 250,
     },
   };
   dimensions.boundedWidth =
@@ -42,7 +42,7 @@ async function drawBarChart() {
 
   const xScale = d3
     .scaleLinear()
-    .domain([0, 100])
+    .domain([0, 1])
     .range([0, dimensions.boundedWidth]);
 
   const yScale = d3
@@ -51,7 +51,7 @@ async function drawBarChart() {
     .range([dimensions.boundedHeight, 0])
     .padding(0.1);
 
-  colorScale = d3.scaleLinear().domain([0, 100]).range(["#99f542", "#eb7d34"]);
+  colorScale = d3.scaleLinear().domain([0, 1]).range(["#99f542", "#eb7d34"]);
 
   // 5. Create Chart
   const barGroup = bounds
@@ -64,12 +64,41 @@ async function drawBarChart() {
     .attr("height", (d) => yScale.bandwidth())
     .attr("fill", (d) => colorScale(xAccessor(d)));
 
+  const mean = d3.mean(data, xAccessor);
+  // console.log(mean);
+  const meanLine = bounds
+    .append("line")
+    .attr("class", "mean")
+    .attr("x1", xScale(mean))
+    .attr("x2", xScale(mean))
+    .attr("y1", -20)
+    .attr("y2", dimensions.boundedHeight)
+    .attr("stroke", "maroon");
+
+  const meanLabel = bounds
+    .append("text")
+    .attr("x", xScale(mean) + 5)
+    .attr("y", -5)
+    .text("mean")
+    .attr("fill", "maroon")
+    .style("font-size", "14px");
+
   // 6. Create Peripherals
-  const xAxisGenerator = d3.axisBottom().scale(xScale);
+  const formatPercent = d3.format(".0%");
+
+  const xAxisGenerator = d3
+    .axisBottom()
+    .scale(xScale)
+    .tickFormat(formatPercent);
+
+  const yAxisGenerator = d3.axisLeft().scale(yScale);
 
   const xAxis = bounds
     .append("g")
     .call(xAxisGenerator)
     .style("transform", `translateY(${dimensions.boundedHeight}px)`);
+
+  const yAxis = bounds.append("g").call(yAxisGenerator).nice();
+  // .style("transform", `translateY(${dimensions.boundedHeight}px)`);
 }
 drawBarChart();
