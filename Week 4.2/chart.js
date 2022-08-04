@@ -98,7 +98,31 @@ async function drawBarChart() {
     .call(xAxisGenerator)
     .style("transform", `translateY(${dimensions.boundedHeight}px)`);
 
-  const yAxis = bounds.append("g").call(yAxisGenerator).nice();
+  const yAxis = bounds.append("g").call(yAxisGenerator);
   // .style("transform", `translateY(${dimensions.boundedHeight}px)`);
+
+  // 7. Set up Interactions
+
+  const tooltip = d3.select("#tooltip");
+  barGroup.on("mouseenter", onMouseEnter).on("mouseleave", onMouseLeave);
+
+  function onMouseEnter(event, d) {
+    console.log(event);
+    // console.log(`${d.rt_score}%`);
+    tooltip.select("#score").text(`${d.rt_score}%`);
+
+    tooltip.style(
+      "transform",
+      `translate(` +
+        `calc(${event.clientX}px),` +
+        `calc(-100% + ${event.clientY}px)` +
+        `)`
+    );
+    tooltip.style("opacity", 1);
+
+    function onMouseLeave(event, d) {
+      tooltip.style("opacity", 0);
+    }
+  }
 }
 drawBarChart();

@@ -12,7 +12,13 @@
 </head>
 <body>
 <h1>Studio Ghibli Film Ratings</h1>
-        <div id="barchart"></div>
+        <div id="barchart">
+          <div class="tooltip" id="tooltip">
+           <div class="score">
+            Score:<span id="score"></span>
+           </div>
+          </div>
+        </div>
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="chart.js"></script>
 </body>
